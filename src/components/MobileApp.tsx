@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Home, 
@@ -28,9 +29,12 @@ const MobileApp = () => {
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <Bell className="h-5 w-5" />
-            <div className="w-8 h-8 bg-primary-foreground/20 rounded-full flex items-center justify-center">
-              <span className="text-sm font-medium">U</span>
-            </div>
+            <Link 
+              to="/login"
+              className="w-8 h-8 bg-primary-foreground/20 rounded-full flex items-center justify-center hover:bg-primary-foreground/30 transition-colors"
+            >
+              <span className="text-sm font-medium">L</span>
+            </Link>
           </div>
         </div>
       </header>

@@ -8,57 +8,57 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Modo claro - tons nude e suaves */
+    /* Modo claro - tons nude e suaves CORRIGIDOS */
     --background: 250 248 246;
-    --foreground: 57 57 57;
+    --foreground: 41 37 36;
 
-    --card: 254 252 250;
-    --card-foreground: 68 64 60;
+    --card: 255 255 255;
+    --card-foreground: 41 37 36;
 
-    --popover: 254 252 250;
-    --popover-foreground: 68 64 60;
+    --popover: 255 255 255;
+    --popover-foreground: 41 37 36;
 
-    --primary: 161 98% 74%;
-    --primary-foreground: 255 253 250;
-    --primary-glow: 180 83% 74%;
-    --primary-deep: 120 53% 15%;
+    --primary: 180 83% 74%;
+    --primary-foreground: 41 37 36;
+    --primary-glow: 200 85% 80%;
+    --primary-deep: 120 53% 25%;
 
-    --secondary: 245 242 240;
-    --secondary-foreground: 87 83 78;
+    --secondary: 245 245 245;
+    --secondary-foreground: 64 64 64;
 
-    --muted: 245 242 240;
-    --muted-foreground: 120 113 108;
+    --muted: 245 245 245;
+    --muted-foreground: 100 100 100;
 
     --accent: 250 247 244;
-    --accent-foreground: 68 64 60;
+    --accent-foreground: 41 37 36;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 255 253 250;
+    --destructive-foreground: 255 255 255;
 
     --success: 142 69% 58%;
-    --success-foreground: 255 253 250;
+    --success-foreground: 255 255 255;
 
     --warning: 25 95% 53%;
-    --warning-foreground: 255 253 250;
+    --warning-foreground: 255 255 255;
 
-    --border: 231 229 228;
-    --input: 231 229 228;
-    --ring: 161 98% 74%;
+    --border: 220 220 220;
+    --input: 220 220 220;
+    --ring: 180 83% 74%;
 
     --radius: 0.5rem;
 
-    /* Gradientes nude elegantes */
-    --gradient-primary: linear-gradient(135deg, hsl(161 98% 74%), hsl(180 83% 74%));
-    --gradient-secondary: linear-gradient(135deg, hsl(245 242 240), hsl(250 247 244));
+    /* Gradientes nude elegantes CORRIGIDOS */
+    --gradient-primary: linear-gradient(135deg, hsl(180 83% 74%), hsl(200 85% 80%));
+    --gradient-secondary: linear-gradient(135deg, hsl(245 245 245), hsl(250 247 244));
     --gradient-success: linear-gradient(135deg, hsl(142 69% 58%), hsl(160 65% 60%));
-    --gradient-elegant: linear-gradient(135deg, hsl(161 98% 74%), hsl(25 85% 78%));
-    --gradient-soft: linear-gradient(135deg, hsl(254 252 250), hsl(250 247 244));
+    --gradient-elegant: linear-gradient(135deg, hsl(180 83% 74%), hsl(200 80% 78%));
+    --gradient-soft: linear-gradient(135deg, hsl(255 255 255), hsl(250 247 244));
     
-    /* Sombras suaves nude */
-    --shadow-sm: 0 1px 2px 0 hsl(161 98% 74% / 0.08);
-    --shadow-md: 0 4px 6px -1px hsl(161 98% 74% / 0.12), 0 2px 4px -1px hsl(161 98% 74% / 0.06);
-    --shadow-lg: 0 10px 15px -3px hsl(161 98% 74% / 0.15), 0 4px 6px -2px hsl(161 98% 74% / 0.08);
-    --shadow-elegant: 0 8px 25px -8px hsl(161 98% 74% / 0.18);
+    /* Sombras suaves nude CORRIGIDAS */
+    --shadow-sm: 0 1px 2px 0 hsl(180 83% 74% / 0.12);
+    --shadow-md: 0 4px 6px -1px hsl(180 83% 74% / 0.18), 0 2px 4px -1px hsl(180 83% 74% / 0.10);
+    --shadow-lg: 0 10px 15px -3px hsl(180 83% 74% / 0.25), 0 4px 6px -2px hsl(180 83% 74% / 0.15);
+    --shadow-elegant: 0 8px 25px -8px hsl(180 83% 74% / 0.25);
     
     /* Mobile specific */
     --mobile-padding: 1rem;
