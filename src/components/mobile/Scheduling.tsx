@@ -148,10 +148,10 @@ const Scheduling = () => {
             {consultants.map((consultant) => (
               <div
                 key={consultant.id}
-                className={`p-3 rounded-mobile border cursor-pointer transition-colors ${
+                className={`p-4 rounded-mobile border cursor-pointer transition-all duration-300 ${
                   selectedConsultant === consultant.id 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-border bg-muted'
+                    ? 'border-primary bg-gradient-soft shadow-sm' 
+                    : 'border-border bg-card hover:bg-gradient-soft/50'
                 }`}
                 onClick={() => setSelectedConsultant(consultant.id)}
               >
@@ -184,9 +184,9 @@ const Scheduling = () => {
               {timeSlots.map((time) => (
                 <Button
                   key={time}
-                  variant="outline"
+                  variant="soft"
                   size="sm"
-                  className="h-10"
+                  className="h-10 hover:scale-105 transition-all duration-200"
                 >
                   {time}
                 </Button>

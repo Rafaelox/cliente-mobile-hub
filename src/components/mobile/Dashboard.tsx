@@ -85,7 +85,7 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           {todayAppointments.map((appointment) => (
-            <div key={appointment.id} className="flex items-center justify-between p-3 bg-muted rounded-mobile">
+            <div className="flex items-center justify-between p-4 bg-gradient-soft rounded-mobile shadow-sm transition-all duration-300 hover:shadow-md">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <p className="font-medium">{appointment.client}</p>
