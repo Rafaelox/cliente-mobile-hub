@@ -9,7 +9,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Modo claro - tons creme claros suaves */
-    --background: 249 246 243;
+    --background: 248 248 248;
     --foreground: 41 37 36;
 
     --card: 254 251 248;
