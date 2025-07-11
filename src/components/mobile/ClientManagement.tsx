@@ -1,85 +1,121 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Search, 
-  Plus, 
-  Phone, 
-  Mail, 
-  User,
-  Filter,
-  MoreVertical,
-  Calendar,
-  Edit
-} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import ClientForm from "./ClientForm";
+import { 
+  Search, 
+  Plus, 
+  MoreVertical, 
+  Phone, 
+  Mail, 
+  Edit,
+  Calendar,
+  User,
+  Filter,
+  Trash2
+} from "lucide-react";
 
 const ClientManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  
-  const clients = [
-    { 
-      id: 1, 
-      name: "Maria Silva", 
-      email: "maria@email.com", 
-      phone: "(11) 99999-9999",
-      status: "active",
-      lastConsult: "2024-01-15",
-      totalConsults: 5
-    },
-    { 
-      id: 2, 
-      name: "Pedro Santos", 
-      email: "pedro@email.com", 
-      phone: "(11) 88888-8888",
-      status: "pending",
-      lastConsult: "2024-01-10",
-      totalConsults: 2
-    },
-    { 
-      id: 3, 
-      name: "Julia Costa", 
-      email: "julia@email.com", 
-      phone: "(11) 77777-7777",
-      status: "active",
-      lastConsult: "2024-01-20",
-      totalConsults: 8
-    },
-    { 
-      id: 4, 
-      name: "Roberto Lima", 
-      email: "roberto@email.com", 
-      phone: "(11) 66666-6666",
-      status: "inactive",
-      lastConsult: "2023-12-01",
-      totalConsults: 1
-    }
-  ];
+  const [clients, setClients] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingClient, setEditingClient] = useState<any>(null);
+  const { toast } = useToast();
 
-  const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    fetchClients();
+  }, []);
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return <Badge className="bg-success text-success-foreground">Ativo</Badge>;
-      case "pending":
-        return <Badge variant="secondary">Pendente</Badge>;
-      case "inactive":
-        return <Badge variant="outline">Inativo</Badge>;
-      default:
-        return <Badge variant="outline">Desconhecido</Badge>;
+  const fetchClients = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('clientes')
+        .select('*')
+        .eq('ativo', true)
+        .order('nome');
+
+      if (error) throw error;
+      setClients(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar clientes",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
+
+  const deleteClient = async (clientId: number) => {
+    try {
+      const { error } = await supabase
+        .from('clientes')
+        .update({ ativo: false })
+        .eq('id', clientId);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Cliente removido",
+        description: "Cliente foi removido com sucesso.",
+      });
+      
+      fetchClients();
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Erro ao remover cliente",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const filteredClients = clients.filter(client =>
+    client.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.telefone?.includes(searchTerm) ||
+    client.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const getStatusBadge = (client: any) => {
+    return <Badge className="bg-success text-success-foreground">Ativo</Badge>;
+  };
+
+  const handleEdit = (client: any) => {
+    setEditingClient(client);
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setEditingClient(null);
+  };
+
+  const handleSaveForm = () => {
+    fetchClients();
+  };
+
+  if (loading) {
+    return (
+      <div className="p-mobile flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando clientes...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-mobile space-y-6">
@@ -102,7 +138,11 @@ const ClientManagement = () => {
       {/* Add New Client */}
       <Card className="shadow-elegant border-0">
         <CardContent className="p-4">
-          <Button variant="gradient" className="w-full h-12">
+          <Button
+            variant="gradient"
+            className="w-full h-12"
+            onClick={() => setShowForm(true)}
+          >
             <Plus className="h-5 w-5 mr-2" />
             Cadastrar Novo Cliente
           </Button>
@@ -120,16 +160,14 @@ const ClientManagement = () => {
         <Card className="shadow-elegant border-0 bg-gradient-soft">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-success">
-              {clients.filter(c => c.status === "active").length}
+              {clients.filter(c => c.ativo).length}
             </p>
             <p className="text-xs text-muted-foreground">Ativos</p>
           </CardContent>
         </Card>
         <Card className="shadow-elegant border-0 bg-gradient-soft">
           <CardContent className="p-3 text-center">
-            <p className="text-2xl font-bold text-warning">
-              {clients.filter(c => c.status === "pending").length}
-            </p>
+            <p className="text-2xl font-bold text-warning">0</p>
             <p className="text-xs text-muted-foreground">Pendentes</p>
           </CardContent>
         </Card>
@@ -147,21 +185,24 @@ const ClientManagement = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-medium truncate">{client.name}</h3>
-                      {getStatusBadge(client.status)}
+                      <h3 className="font-medium truncate">{client.nome}</h3>
+                      {getStatusBadge(client)}
                     </div>
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Mail className="h-3 w-3" />
-                        <span className="truncate">{client.email}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Phone className="h-3 w-3" />
-                        <span>{client.phone}</span>
-                      </div>
+                      {client.email && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Mail className="h-3 w-3" />
+                          <span className="truncate">{client.email}</span>
+                        </div>
+                      )}
+                      {client.telefone && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Phone className="h-3 w-3" />
+                          <span>{client.telefone}</span>
+                        </div>
+                      )}
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span>{client.totalConsults} consultas</span>
-                        <span>Última: {new Date(client.lastConsult).toLocaleDateString('pt-BR')}</span>
+                        <span>Cadastrado: {new Date(client.created_at).toLocaleDateString('pt-BR')}</span>
                       </div>
                     </div>
                   </div>
@@ -174,7 +215,7 @@ const ClientManagement = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleEdit(client)}>
                       <Edit className="h-4 w-4 mr-2" />
                       Editar
                     </DropdownMenuItem>
@@ -182,9 +223,18 @@ const ClientManagement = () => {
                       <Calendar className="h-4 w-4 mr-2" />
                       Agendar
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Phone className="h-4 w-4 mr-2" />
-                      Ligar
+                    {client.telefone && (
+                      <DropdownMenuItem>
+                        <Phone className="h-4 w-4 mr-2" />
+                        Ligar
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem
+                      onClick={() => deleteClient(client.id)}
+                      className="text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Remover
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -203,6 +253,15 @@ const ClientManagement = () => {
             </p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Client Form Modal */}
+      {showForm && (
+        <ClientForm
+          client={editingClient}
+          onClose={handleCloseForm}
+          onSave={handleSaveForm}
+        />
       )}
     </div>
   );

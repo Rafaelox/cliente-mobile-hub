@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
 import { 
   Eye, 
@@ -17,11 +19,21 @@ import {
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     name: ""
   });
+  
+  const { signIn, signUp, user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -30,10 +42,26 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Aqui você conectaria com sua API/Supabase existente
+    setLoading(true);
+    
+    try {
+      if (isLogin) {
+        const { error } = await signIn(formData.email, formData.password);
+        if (!error) {
+          navigate('/');
+        }
+      } else {
+        const { error } = await signUp(formData.email, formData.password, formData.name);
+        if (!error) {
+          setIsLogin(true);
+          setFormData({ email: "", password: "", name: "" });
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -156,8 +184,11 @@ const Login = () => {
                 type="submit"
                 variant="elegant"
                 className="w-full h-12 text-base font-medium"
+                disabled={loading}
               >
-                {isLogin ? (
+                {loading ? (
+                  "Carregando..."
+                ) : isLogin ? (
                   <>
                     <LogIn className="h-5 w-5 mr-2" />
                     Entrar
