@@ -8,71 +8,71 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Modo claro - tons nude e suaves CORRIGIDOS */
-    --background: 250 248 246;
+    /* Modo claro - tons creme claros suaves */
+    --background: 249 246 243;
     --foreground: 41 37 36;
 
-    --card: 255 255 255;
+    --card: 254 251 248;
     --card-foreground: 41 37 36;
 
-    --popover: 255 255 255;
+    --popover: 254 251 248;
     --popover-foreground: 41 37 36;
 
-    --primary: 180 83% 74%;
-    --primary-foreground: 41 37 36;
-    --primary-glow: 200 85% 80%;
-    --primary-deep: 120 53% 25%;
+    --primary: 25 25% 60%;
+    --primary-foreground: 255 255 255;
+    --primary-glow: 25 30% 70%;
+    --primary-deep: 25 25% 45%;
 
-    --secondary: 245 245 245;
-    --secondary-foreground: 64 64 64;
+    --secondary: 248 245 242;
+    --secondary-foreground: 78 70 68;
 
-    --muted: 245 245 245;
-    --muted-foreground: 100 100 100;
+    --muted: 248 245 242;
+    --muted-foreground: 120 113 108;
 
-    --accent: 250 247 244;
+    --accent: 252 249 246;
     --accent-foreground: 41 37 36;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 255 255 255;
 
-    --success: 142 69% 58%;
+    --success: 154 60% 51%;
     --success-foreground: 255 255 255;
 
-    --warning: 25 95% 53%;
+    --warning: 32 95% 44%;
     --warning-foreground: 255 255 255;
 
-    --border: 220 220 220;
-    --input: 220 220 220;
-    --ring: 180 83% 74%;
+    --border: 231 225 220;
+    --input: 231 225 220;
+    --ring: 25 25% 60%;
 
     --radius: 0.5rem;
 
-    /* Gradientes nude elegantes CORRIGIDOS */
-    --gradient-primary: linear-gradient(135deg, hsl(180 83% 74%), hsl(200 85% 80%));
-    --gradient-secondary: linear-gradient(135deg, hsl(245 245 245), hsl(250 247 244));
-    --gradient-success: linear-gradient(135deg, hsl(142 69% 58%), hsl(160 65% 60%));
-    --gradient-elegant: linear-gradient(135deg, hsl(180 83% 74%), hsl(200 80% 78%));
-    --gradient-soft: linear-gradient(135deg, hsl(255 255 255), hsl(250 247 244));
+    /* Gradientes creme claros suaves */
+    --gradient-primary: linear-gradient(135deg, hsl(25 25% 60%), hsl(25 30% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(248 245 242), hsl(252 249 246));
+    --gradient-success: linear-gradient(135deg, hsl(154 60% 51%), hsl(160 55% 55%));
+    --gradient-elegant: linear-gradient(135deg, hsl(25 25% 60%), hsl(32 30% 65%));
+    --gradient-soft: linear-gradient(135deg, hsl(254 251 248), hsl(252 249 246));
     
-    /* Sombras suaves nude CORRIGIDAS */
-    --shadow-sm: 0 1px 2px 0 hsl(180 83% 74% / 0.12);
-    --shadow-md: 0 4px 6px -1px hsl(180 83% 74% / 0.18), 0 2px 4px -1px hsl(180 83% 74% / 0.10);
-    --shadow-lg: 0 10px 15px -3px hsl(180 83% 74% / 0.25), 0 4px 6px -2px hsl(180 83% 74% / 0.15);
-    --shadow-elegant: 0 8px 25px -8px hsl(180 83% 74% / 0.25);
+    /* Sombras suaves creme */
+    --shadow-sm: 0 1px 2px 0 hsl(25 25% 60% / 0.12);
+    --shadow-md: 0 4px 6px -1px hsl(25 25% 60% / 0.18), 0 2px 4px -1px hsl(25 25% 60% / 0.10);
+    --shadow-lg: 0 10px 15px -3px hsl(25 25% 60% / 0.25), 0 4px 6px -2px hsl(25 25% 60% / 0.15);
+    --shadow-elegant: 0 8px 25px -8px hsl(25 25% 60% / 0.25);
     
     /* Mobile specific */
     --mobile-padding: 1rem;
     --mobile-radius: 1rem;
 
     /* Sidebar colors for compatibility */
-    --sidebar-background: 250 248 246;
-    --sidebar-foreground: 68 64 60;
-    --sidebar-primary: 161 98% 74%;
-    --sidebar-primary-foreground: 255 253 250;
-    --sidebar-accent: 245 242 240;
-    --sidebar-accent-foreground: 68 64 60;
-    --sidebar-border: 231 229 228;
-    --sidebar-ring: 161 98% 74%;
+    --sidebar-background: 249 246 243;
+    --sidebar-foreground: 78 70 68;
+    --sidebar-primary: 25 25% 60%;
+    --sidebar-primary-foreground: 255 255 255;
+    --sidebar-accent: 248 245 242;
+    --sidebar-accent-foreground: 78 70 68;
+    --sidebar-border: 231 225 220;
+    --sidebar-ring: 25 25% 60%;
   }
 
   .dark {
