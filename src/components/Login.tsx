@@ -37,7 +37,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent to-secondary flex items-center justify-center p-mobile">
+    <div className="min-h-screen bg-background flex items-center justify-center p-mobile">
       {/* Toggle de tema no canto superior direito */}
       <div className="absolute top-6 right-6 z-10">
         <ThemeToggle />
