@@ -100,7 +100,7 @@ const ClientManagement = () => {
       </div>
 
       {/* Add New Client */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardContent className="p-4">
           <Button variant="gradient" className="w-full h-12">
             <Plus className="h-5 w-5 mr-2" />
@@ -111,13 +111,13 @@ const ClientManagement = () => {
 
       {/* Client Stats */}
       <div className="grid grid-cols-3 gap-3">
-        <Card className="shadow-mobile-sm">
+        <Card className="shadow-elegant border-0 bg-gradient-soft">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-primary">{clients.length}</p>
             <p className="text-xs text-muted-foreground">Total</p>
           </CardContent>
         </Card>
-        <Card className="shadow-mobile-sm">
+        <Card className="shadow-elegant border-0 bg-gradient-soft">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-success">
               {clients.filter(c => c.status === "active").length}
@@ -125,7 +125,7 @@ const ClientManagement = () => {
             <p className="text-xs text-muted-foreground">Ativos</p>
           </CardContent>
         </Card>
-        <Card className="shadow-mobile-sm">
+        <Card className="shadow-elegant border-0 bg-gradient-soft">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-warning">
               {clients.filter(c => c.status === "pending").length}
@@ -138,7 +138,7 @@ const ClientManagement = () => {
       {/* Client List */}
       <div className="space-y-3">
         {filteredClients.map((client) => (
-          <Card key={client.id} className="shadow-mobile-sm">
+          <Card key={client.id} className="shadow-elegant border-0">
             <CardContent className="p-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">

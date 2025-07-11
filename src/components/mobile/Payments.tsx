@@ -115,7 +115,7 @@ const Payments = () => {
   return (
     <div className="p-mobile space-y-6">
       {/* Period Filter */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
             <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
@@ -139,7 +139,7 @@ const Payments = () => {
       {/* Payment Stats */}
       <div className="grid grid-cols-2 gap-4">
         {paymentStats.map((stat, index) => (
-          <Card key={index} className="shadow-mobile-sm">
+          <Card key={index} className="shadow-elegant border-0 bg-gradient-soft">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -154,17 +154,17 @@ const Payments = () => {
       </div>
 
       {/* Quick Actions */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Ações Rápidas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="gradient" className="h-12">
+            <Button variant="elegant" className="h-12">
               <Plus className="h-4 w-4 mr-2" />
               Nova Cobrança
             </Button>
-            <Button variant="outline" className="h-12">
+            <Button variant="soft" className="h-12">
               <Download className="h-4 w-4 mr-2" />
               Relatório
             </Button>
@@ -173,7 +173,7 @@ const Payments = () => {
       </Card>
 
       {/* Payment Methods Setup */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Métodos de Pagamento</CardTitle>
         </CardHeader>
@@ -197,7 +197,7 @@ const Payments = () => {
       </Card>
 
       {/* Recent Payments */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center">
             <CreditCard className="h-5 w-5 mr-2 text-primary" />
@@ -246,7 +246,7 @@ const Payments = () => {
       </Card>
 
       {/* Payment Analytics */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center">
             <TrendingUp className="h-5 w-5 mr-2 text-primary" />

@@ -42,7 +42,7 @@ const Dashboard = () => {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-4">
         {stats.map((stat, index) => (
-          <Card key={index} className="shadow-mobile-sm">
+          <Card key={index} className="shadow-elegant border-0 bg-gradient-soft">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -57,17 +57,17 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Ações Rápidas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="gradient" className="h-12">
+            <Button variant="elegant" className="h-12">
               <Plus className="h-4 w-4 mr-2" />
               Novo Cliente
             </Button>
-            <Button variant="outline" className="h-12">
+            <Button variant="soft" className="h-12">
               <Calendar className="h-4 w-4 mr-2" />
               Agendar
             </Button>
@@ -76,7 +76,7 @@ const Dashboard = () => {
       </Card>
 
       {/* Today's Appointments */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center">
             <Clock className="h-5 w-5 mr-2 text-primary" />
@@ -109,7 +109,7 @@ const Dashboard = () => {
       </Card>
 
       {/* Recent Activity */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Atividades Recentes</CardTitle>
         </CardHeader>

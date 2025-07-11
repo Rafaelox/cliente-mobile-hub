@@ -92,9 +92,9 @@ const Scheduling = () => {
   return (
     <div className="p-mobile space-y-6">
       {/* Quick Actions */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardContent className="p-4">
-          <Button variant="gradient" className="w-full h-12">
+          <Button variant="elegant" className="w-full h-12">
             <Plus className="h-5 w-5 mr-2" />
             Novo Agendamento
           </Button>
@@ -102,7 +102,7 @@ const Scheduling = () => {
       </Card>
 
       {/* Calendar */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center">
             <CalendarIcon className="h-5 w-5 mr-2 text-primary" />
@@ -120,7 +120,7 @@ const Scheduling = () => {
       </Card>
 
       {/* Consultant Selection */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Selecionar Consultor</CardTitle>
         </CardHeader>
@@ -172,7 +172,7 @@ const Scheduling = () => {
 
       {/* Available Time Slots */}
       {selectedDate && selectedConsultant && (
-        <Card className="shadow-mobile-md">
+        <Card className="shadow-elegant border-0">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg">Horários Disponíveis</CardTitle>
             <p className="text-sm text-muted-foreground">
@@ -197,7 +197,7 @@ const Scheduling = () => {
       )}
 
       {/* Today's Appointments */}
-      <Card className="shadow-mobile-md">
+      <Card className="shadow-elegant border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center">
             <Clock className="h-5 w-5 mr-2 text-primary" />
