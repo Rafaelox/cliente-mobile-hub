@@ -65,7 +65,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-mobile">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {/* Toggle de tema no canto superior direito */}
       <div className="absolute top-6 right-6 z-10">
         <ThemeToggle />
@@ -75,7 +75,7 @@ const Login = () => {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-elegant rounded-full mb-4 shadow-elegant">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4 shadow-lg">
             <Sparkles className="h-8 w-8 text-primary-foreground" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-2">ConsultApp</h1>
@@ -85,7 +85,7 @@ const Login = () => {
         </div>
 
         {/* Card de Login */}
-        <Card className="shadow-elegant border-0 bg-card/90 backdrop-blur-lg">
+        <Card className="shadow-lg border-0 bg-card/90 backdrop-blur-lg">
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-2xl font-semibold">
               {isLogin ? "Fazer Login" : "Criar Conta"}
@@ -172,7 +172,7 @@ const Login = () => {
                 <div className="text-right">
                   <button
                     type="button"
-                    className="text-sm text-primary hover:text-primary-deep transition-colors"
+                    className="text-sm text-primary hover:text-primary/80 transition-colors"
                   >
                     Esqueci minha senha
                   </button>
@@ -219,7 +219,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
-                  className="ml-2 text-primary hover:text-primary-deep font-medium transition-colors"
+                  className="ml-2 text-primary hover:text-primary/80 font-medium transition-colors"
                 >
                   {isLogin ? "Criar conta" : "Fazer login"}
                 </button>

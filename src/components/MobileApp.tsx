@@ -47,7 +47,7 @@ const MobileApp = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-gradient-elegant text-primary-foreground p-mobile border-b shadow-elegant">
+      <header className="bg-primary text-primary-foreground p-4 border-b shadow-lg">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold">ConsultApp</h1>
@@ -87,33 +87,33 @@ const MobileApp = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t shadow-elegant">
+      <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t shadow-lg">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4 bg-transparent h-16">
             <TabsTrigger 
               value="dashboard" 
-              className="flex flex-col gap-1 rounded-mobile data-[state=active]:bg-gradient-soft data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-300"
+              className="flex flex-col gap-1 rounded-md data-[state=active]:bg-secondary data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-300"
             >
               <Home className="h-5 w-5" />
               <span className="text-xs">Início</span>
             </TabsTrigger>
             <TabsTrigger 
               value="clients"
-              className="flex flex-col gap-1 rounded-mobile data-[state=active]:bg-gradient-soft data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-300"
+              className="flex flex-col gap-1 rounded-md data-[state=active]:bg-secondary data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-300"
             >
               <Users className="h-5 w-5" />
               <span className="text-xs">Clientes</span>
             </TabsTrigger>
             <TabsTrigger 
               value="schedule"
-              className="flex flex-col gap-1 rounded-mobile data-[state=active]:bg-gradient-soft data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-300"
+              className="flex flex-col gap-1 rounded-md data-[state=active]:bg-secondary data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-300"
             >
               <Calendar className="h-5 w-5" />
               <span className="text-xs">Agenda</span>
             </TabsTrigger>
             <TabsTrigger 
               value="payments"
-              className="flex flex-col gap-1 rounded-mobile data-[state=active]:bg-gradient-soft data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-300"
+              className="flex flex-col gap-1 rounded-md data-[state=active]:bg-secondary data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-300"
             >
               <CreditCard className="h-5 w-5" />
               <span className="text-xs">Pagamentos</span>
