@@ -54,7 +54,7 @@ export const useInitialData = () => {
       if (consultorsError) throw consultorsError;
 
       // Criar serviços
-      const { error: servicosError } = await supabase
+      const { data: servicosData, error: servicosError } = await supabase
         .from('servicos')
         .insert([
           {
@@ -78,7 +78,8 @@ export const useInitialData = () => {
             duracao_minutos: 30,
             ativo: true
           }
-        ]);
+        ])
+        .select();
 
       if (servicosError) throw servicosError;
 
@@ -154,6 +155,66 @@ export const useInitialData = () => {
         ]);
 
       if (origensError) throw origensError;
+
+      // Criar clientes de exemplo
+      const { data: clientsData, error: clientsError } = await supabase
+        .from('clientes')
+        .insert([
+          {
+            nome: 'Maria Santos',
+            email: 'maria@exemplo.com',
+            telefone: '(11) 98765-4321',
+            cpf: '123.456.789-00',
+            ativo: true
+          },
+          {
+            nome: 'Pedro Oliveira',
+            email: 'pedro@exemplo.com',
+            telefone: '(11) 98765-1234',
+            cpf: '987.654.321-00',
+            ativo: true
+          },
+          {
+            nome: 'Ana Silva',
+            email: 'ana.silva@exemplo.com',
+            telefone: '(11) 91234-5678',
+            cpf: '456.789.123-00',
+            ativo: true
+          }
+        ])
+        .select();
+
+      if (clientsError) throw clientsError;
+
+      // Criar alguns agendamentos de exemplo se temos dados
+      if (consultorsData && servicosData && clientsData) {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        await supabase.from('agenda').insert([
+          {
+            cliente_id: clientsData[0].id,
+            consultor_id: consultorsData[0].id,
+            servico_id: servicosData[0].id,
+            data_agendamento: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 0).toISOString(),
+            valor_servico: servicosData[0].preco,
+            comissao_consultor: servicosData[0].preco * (consultorsData[0].percentual_comissao / 100),
+            status: 'agendado',
+            observacoes: 'Primeira consulta'
+          },
+          {
+            cliente_id: clientsData[1].id,
+            consultor_id: consultorsData[1].id,
+            servico_id: servicosData[1].id,
+            data_agendamento: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 10, 30).toISOString(),
+            valor_servico: servicosData[1].preco,
+            comissao_consultor: servicosData[1].preco * (consultorsData[1].percentual_comissao / 100),
+            status: 'confirmado',
+            observacoes: 'Exame de rotina anual'
+          }
+        ]);
+      }
 
       toast({
         title: "Dados iniciais criados",

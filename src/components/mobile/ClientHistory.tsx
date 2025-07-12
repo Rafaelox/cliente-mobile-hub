@@ -95,9 +95,9 @@ const ClientHistory = ({ clientId }: ClientHistoryProps) => {
   };
 
   return (
-    <div className="p-mobile space-y-6">
+    <div className="p-4 space-y-6">
       {/* Client Selector */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <HistoryIcon className="h-5 w-5" />
@@ -124,15 +124,15 @@ const ClientHistory = ({ clientId }: ClientHistoryProps) => {
         <>
           {/* Summary Stats */}
           <div className="grid grid-cols-2 gap-3">
-            <Card className="shadow-elegant border-0 bg-gradient-soft">
+            <Card className="shadow-lg border-0 bg-muted/50">
               <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-primary">{getTotalVisits()}</p>
                 <p className="text-sm text-muted-foreground">Total de Consultas</p>
               </CardContent>
             </Card>
-            <Card className="shadow-elegant border-0 bg-gradient-soft">
+            <Card className="shadow-lg border-0 bg-muted/50">
               <CardContent className="p-4 text-center">
-                <p className="text-2xl font-bold text-success">
+                <p className="text-2xl font-bold text-green-600">
                   R$ {getTotalSpent().toFixed(2)}
                 </p>
                 <p className="text-sm text-muted-foreground">Total Gasto</p>
@@ -141,7 +141,7 @@ const ClientHistory = ({ clientId }: ClientHistoryProps) => {
           </div>
 
           {/* History List */}
-          <Card className="shadow-elegant border-0">
+          <Card className="shadow-lg border-0">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">Consultas Realizadas</CardTitle>
             </CardHeader>
@@ -174,7 +174,7 @@ const ClientHistory = ({ clientId }: ClientHistoryProps) => {
                             </span>
                           </div>
                         </div>
-                        <Badge variant="outline" className="text-success border-success">
+                        <Badge variant="outline" className="text-green-600 border-green-600">
                           Concluído
                         </Badge>
                       </div>

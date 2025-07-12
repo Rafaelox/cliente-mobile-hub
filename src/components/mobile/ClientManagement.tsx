@@ -89,7 +89,7 @@ const ClientManagement = () => {
   );
 
   const getStatusBadge = (client: any) => {
-    return <Badge className="bg-success text-success-foreground">Ativo</Badge>;
+    return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
   };
 
   const handleEdit = (client: any) => {
@@ -108,7 +108,7 @@ const ClientManagement = () => {
 
   if (loading) {
     return (
-      <div className="p-mobile flex items-center justify-center">
+      <div className="p-4 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Carregando clientes...</p>
@@ -118,7 +118,7 @@ const ClientManagement = () => {
   }
 
   return (
-    <div className="p-mobile space-y-6">
+    <div className="p-4 space-y-6">
       {/* Header Actions */}
       <div className="flex gap-3">
         <div className="flex-1 relative">
@@ -136,10 +136,9 @@ const ClientManagement = () => {
       </div>
 
       {/* Add New Client */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardContent className="p-4">
           <Button
-            variant="gradient"
             className="w-full h-12"
             onClick={() => setShowForm(true)}
           >
@@ -151,23 +150,23 @@ const ClientManagement = () => {
 
       {/* Client Stats */}
       <div className="grid grid-cols-3 gap-3">
-        <Card className="shadow-elegant border-0 bg-gradient-soft">
+        <Card className="shadow-lg border-0 bg-muted/50">
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-primary">{clients.length}</p>
             <p className="text-xs text-muted-foreground">Total</p>
           </CardContent>
         </Card>
-        <Card className="shadow-elegant border-0 bg-gradient-soft">
+        <Card className="shadow-lg border-0 bg-muted/50">
           <CardContent className="p-3 text-center">
-            <p className="text-2xl font-bold text-success">
+            <p className="text-2xl font-bold text-green-600">
               {clients.filter(c => c.ativo).length}
             </p>
             <p className="text-xs text-muted-foreground">Ativos</p>
           </CardContent>
         </Card>
-        <Card className="shadow-elegant border-0 bg-gradient-soft">
+        <Card className="shadow-lg border-0 bg-muted/50">
           <CardContent className="p-3 text-center">
-            <p className="text-2xl font-bold text-warning">0</p>
+            <p className="text-2xl font-bold text-orange-600">0</p>
             <p className="text-xs text-muted-foreground">Pendentes</p>
           </CardContent>
         </Card>
@@ -176,7 +175,7 @@ const ClientManagement = () => {
       {/* Client List */}
       <div className="space-y-3">
         {filteredClients.map((client) => (
-          <Card key={client.id} className="shadow-elegant border-0">
+          <Card key={client.id} className="shadow-lg border-0">
             <CardContent className="p-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
@@ -245,7 +244,7 @@ const ClientManagement = () => {
       </div>
 
       {filteredClients.length === 0 && (
-        <Card className="shadow-mobile-md">
+        <Card className="shadow-lg">
           <CardContent className="p-8 text-center">
             <User className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
             <p className="text-muted-foreground">
