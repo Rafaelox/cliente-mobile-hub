@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import PaymentForm from "./PaymentForm";
 import { 
   CreditCard, 
   DollarSign, 
@@ -24,98 +27,129 @@ import {
 
 const Payments = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("month");
+  const [payments, setPayments] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    receitaTotal: 0,
+    pendente: 0,
+    esteMes: 0,
+    recebido: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchPaymentData();
+  }, [selectedPeriod]);
+
+  const fetchPaymentData = async () => {
+    try {
+      // Buscar todos os pagamentos
+      const { data: paymentsData, error: paymentsError } = await supabase
+        .from('pagamentos')
+        .select(`
+          *,
+          clientes:cliente_id (nome),
+          servicos:servico_id (nome),
+          formas_pagamento:forma_pagamento_id (nome)
+        `)
+        .order('data_pagamento', { ascending: false })
+        .limit(50);
+
+      if (paymentsError) throw paymentsError;
+
+      // Calcular estatísticas
+      const now = new Date();
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      
+      const entradas = paymentsData?.filter(p => p.tipo_transacao === 'entrada') || [];
+      const receitaTotal = entradas.reduce((sum, p) => sum + (p.valor || 0), 0);
+      const esteMes = entradas
+        .filter(p => new Date(p.data_pagamento) >= firstDayOfMonth)
+        .reduce((sum, p) => sum + (p.valor || 0), 0);
+
+      // Buscar pagamentos pendentes (histórico sem pagamento registrado)
+      const { data: historicoSemPagamento, error: historicoError } = await supabase
+        .from('historico')
+        .select(`
+          *,
+          pagamentos:pagamentos!atendimento_id (id)
+        `)
+        .is('pagamentos.id', null);
+
+      if (historicoError) throw historicoError;
+
+      const pendente = historicoSemPagamento?.reduce((sum, h) => sum + (h.valor_final || h.valor_servico || 0), 0) || 0;
+
+      setStats({
+        receitaTotal,
+        pendente,
+        esteMes,
+        recebido: receitaTotal
+      });
+
+      setPayments(paymentsData || []);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar dados de pagamentos",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusBadge = (payment: any) => {
+    if (payment.tipo_transacao === 'entrada') {
+      return <Badge className="bg-success text-success-foreground">Recebido</Badge>;
+    } else {
+      return <Badge variant="destructive">Saída</Badge>;
+    }
+  };
+
+  const getStatusIcon = (payment: any) => {
+    if (payment.tipo_transacao === 'entrada') {
+      return <CheckCircle className="h-4 w-4 text-success" />;
+    } else {
+      return <AlertTriangle className="h-4 w-4 text-destructive" />;
+    }
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
+  const handleSaveForm = () => {
+    fetchPaymentData();
+    setShowForm(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   const paymentStats = [
-    { title: "Receita Total", value: "R$ 12.500", icon: DollarSign, color: "text-success" },
-    { title: "Pendente", value: "R$ 2.300", icon: Clock, color: "text-warning" },
-    { title: "Este Mês", value: "R$ 8.900", icon: TrendingUp, color: "text-primary" },
-    { title: "Recebido", value: "R$ 10.200", icon: CheckCircle, color: "text-success" },
+    { title: "Receita Total", value: formatCurrency(stats.receitaTotal), icon: DollarSign, color: "text-success" },
+    { title: "Pendente", value: formatCurrency(stats.pendente), icon: Clock, color: "text-warning" },
+    { title: "Este Mês", value: formatCurrency(stats.esteMes), icon: TrendingUp, color: "text-primary" },
+    { title: "Recebido", value: formatCurrency(stats.recebido), icon: CheckCircle, color: "text-success" },
   ];
-
-  const payments = [
-    {
-      id: 1,
-      client: "Maria Silva",
-      amount: 150.00,
-      service: "Consulta Cardiologia",
-      date: "2024-01-15",
-      status: "paid",
-      method: "credit_card"
-    },
-    {
-      id: 2,
-      client: "Pedro Santos",
-      amount: 200.00,
-      service: "Consulta Dermatologia",
-      date: "2024-01-14",
-      status: "pending",
-      method: "pix"
-    },
-    {
-      id: 3,
-      client: "Julia Costa",
-      amount: 180.00,
-      service: "Consulta Ortopedia",
-      date: "2024-01-13",
-      status: "paid",
-      method: "debit_card"
-    },
-    {
-      id: 4,
-      client: "Roberto Lima",
-      amount: 120.00,
-      service: "Consulta Geral",
-      date: "2024-01-12",
-      status: "overdue",
-      method: "bank_slip"
-    },
-  ];
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "paid":
-        return <Badge className="bg-success text-success-foreground">Pago</Badge>;
-      case "pending":
-        return <Badge variant="secondary">Pendente</Badge>;
-      case "overdue":
-        return <Badge variant="destructive">Vencido</Badge>;
-      default:
-        return <Badge variant="outline">Indefinido</Badge>;
-    }
-  };
-
-  const getPaymentMethodLabel = (method: string) => {
-    switch (method) {
-      case "credit_card":
-        return "Cartão de Crédito";
-      case "debit_card":
-        return "Cartão de Débito";
-      case "pix":
-        return "PIX";
-      case "bank_slip":
-        return "Boleto";
-      default:
-        return "Não informado";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "paid":
-        return <CheckCircle className="h-4 w-4 text-success" />;
-      case "pending":
-        return <Clock className="h-4 w-4 text-warning" />;
-      case "overdue":
-        return <AlertTriangle className="h-4 w-4 text-destructive" />;
-      default:
-        return <Clock className="h-4 w-4 text-muted-foreground" />;
-    }
-  };
 
   return (
-    <div className="p-mobile space-y-6">
+    <div className="p-4 space-y-6">
       {/* Period Filter */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
             <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
@@ -139,7 +173,7 @@ const Payments = () => {
       {/* Payment Stats */}
       <div className="grid grid-cols-2 gap-4">
         {paymentStats.map((stat, index) => (
-          <Card key={index} className="shadow-elegant border-0 bg-gradient-soft">
+          <Card key={index} className="shadow-lg border-0 bg-secondary">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -154,17 +188,21 @@ const Payments = () => {
       </div>
 
       {/* Quick Actions */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Ações Rápidas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="elegant" className="h-12">
+            <Button 
+              variant="default" 
+              className="h-12"
+              onClick={() => setShowForm(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
-              Nova Cobrança
+              Novo Pagamento
             </Button>
-            <Button variant="soft" className="h-12">
+            <Button variant="outline" className="h-12">
               <Download className="h-4 w-4 mr-2" />
               Relatório
             </Button>
@@ -172,32 +210,8 @@ const Payments = () => {
         </CardContent>
       </Card>
 
-      {/* Payment Methods Setup */}
-      <Card className="shadow-elegant border-0">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Métodos de Pagamento</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 bg-muted rounded-mobile text-center">
-              <CreditCard className="h-6 w-6 mx-auto mb-2 text-primary" />
-              <p className="text-sm font-medium">Cartão</p>
-              <p className="text-xs text-muted-foreground">Configurado</p>
-            </div>
-            <div className="p-3 bg-muted rounded-mobile text-center">
-              <DollarSign className="h-6 w-6 mx-auto mb-2 text-success" />
-              <p className="text-sm font-medium">PIX</p>
-              <p className="text-xs text-muted-foreground">Ativo</p>
-            </div>
-          </div>
-          <Button variant="outline" className="w-full">
-            Configurar Métodos
-          </Button>
-        </CardContent>
-      </Card>
-
       {/* Recent Payments */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center">
             <CreditCard className="h-5 w-5 mr-2 text-primary" />
@@ -206,31 +220,36 @@ const Payments = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           {payments.map((payment) => (
-            <div key={payment.id} className="p-3 bg-muted rounded-mobile">
+            <div key={payment.id} className="p-3 bg-muted rounded-md">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                    {getStatusIcon(payment.status)}
+                    {getStatusIcon(payment)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium truncate">{payment.client}</h4>
-                      {getStatusBadge(payment.status)}
+                      <h4 className="font-medium truncate">{payment.clientes?.nome}</h4>
+                      {getStatusBadge(payment)}
                     </div>
-                    <p className="text-sm text-muted-foreground truncate">{payment.service}</p>
+                    <p className="text-sm text-muted-foreground truncate">{payment.servicos?.nome}</p>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        <span>{new Date(payment.date).toLocaleDateString('pt-BR')}</span>
+                        <span>{new Date(payment.data_pagamento).toLocaleDateString('pt-BR')}</span>
                       </div>
-                      <span>{getPaymentMethodLabel(payment.method)}</span>
+                      <span>{payment.formas_pagamento?.nome}</span>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-lg">
-                    R$ {payment.amount.toFixed(2).replace('.', ',')}
+                  <p className={`font-bold text-lg ${payment.tipo_transacao === 'entrada' ? 'text-success' : 'text-destructive'}`}>
+                    {payment.tipo_transacao === 'saida' ? '- ' : ''}{formatCurrency(payment.valor)}
                   </p>
+                  {payment.numero_parcelas > 1 && (
+                    <p className="text-xs text-muted-foreground">
+                      {payment.numero_parcelas}x parcelas
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -246,7 +265,7 @@ const Payments = () => {
       </Card>
 
       {/* Payment Analytics */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center">
             <TrendingUp className="h-5 w-5 mr-2 text-primary" />
@@ -256,20 +275,32 @@ const Payments = () => {
         <CardContent className="space-y-4">
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Taxa de Conversão</span>
-              <span className="font-medium">85%</span>
+              <span className="text-sm text-muted-foreground">Total de Transações</span>
+              <span className="font-medium">{payments.length}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Ticket Médio</span>
-              <span className="font-medium">R$ 162,50</span>
+              <span className="font-medium">
+                {payments.length > 0 ? formatCurrency(stats.receitaTotal / payments.filter(p => p.tipo_transacao === 'entrada').length) : 'R$ 0,00'}
+              </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Crescimento Mensal</span>
-              <span className="font-medium text-success">+12%</span>
+              <span className="text-sm text-muted-foreground">Eficiência de Cobrança</span>
+              <span className="font-medium text-success">
+                {stats.pendente > 0 ? Math.round((stats.recebido / (stats.recebido + stats.pendente)) * 100) : 100}%
+              </span>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Payment Form Modal */}
+      {showForm && (
+        <PaymentForm
+          onClose={() => setShowForm(false)}
+          onSave={handleSaveForm}
+        />
+      )}
     </div>
   );
 };

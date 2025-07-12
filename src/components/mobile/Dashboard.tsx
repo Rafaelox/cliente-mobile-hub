@@ -1,6 +1,9 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Calendar, 
   Users, 
@@ -13,36 +16,128 @@ import {
 } from "lucide-react";
 
 const Dashboard = () => {
-  const todayAppointments = [
-    { id: 1, client: "Maria Silva", time: "09:00", consultant: "Dr. João", status: "confirmed" },
-    { id: 2, client: "Pedro Santos", time: "11:00", consultant: "Dra. Ana", status: "pending" },
-    { id: 3, client: "Julia Costa", time: "14:30", consultant: "Dr. João", status: "confirmed" },
-  ];
+  const [stats, setStats] = useState({
+    agendamentosHoje: 0,
+    clientesAtivos: 0,
+    receitaMensal: 0,
+    taxaConversao: 0
+  });
+  const [todayAppointments, setTodayAppointments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  const stats = [
-    { title: "Agendamentos Hoje", value: "8", icon: Calendar, color: "text-primary" },
-    { title: "Clientes Ativos", value: "142", icon: Users, color: "text-success" },
-    { title: "Receita Mensal", value: "R$ 12.5k", icon: CreditCard, color: "text-warning" },
-    { title: "Taxa Conversão", value: "85%", icon: TrendingUp, color: "text-primary" },
-  ];
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return <Badge variant="default" className="bg-success text-success-foreground">Confirmado</Badge>;
-      case "pending":
-        return <Badge variant="secondary">Pendente</Badge>;
-      default:
-        return <Badge variant="outline">Cancelado</Badge>;
+  const fetchDashboardData = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Buscar agendamentos de hoje
+      const { data: agendamentos, error: agendamentosError } = await supabase
+        .from('agenda')
+        .select(`
+          *,
+          clientes:cliente_id (nome),
+          consultores:consultor_id (nome)
+        `)
+        .gte('data_agendamento', today)
+        .lt('data_agendamento', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString())
+        .order('data_agendamento');
+
+      if (agendamentosError) throw agendamentosError;
+
+      // Buscar total de clientes ativos
+      const { count: clientesCount, error: clientesError } = await supabase
+        .from('clientes')
+        .select('id', { count: 'exact' })
+        .eq('ativo', true);
+
+      if (clientesError) throw clientesError;
+
+      // Buscar receita do mês atual
+      const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+      const { data: pagamentos, error: pagamentosError } = await supabase
+        .from('pagamentos')
+        .select('valor')
+        .gte('data_pagamento', firstDayOfMonth)
+        .eq('tipo_transacao', 'entrada');
+
+      if (pagamentosError) throw pagamentosError;
+
+      const receitaMensal = pagamentos?.reduce((sum, p) => sum + (p.valor || 0), 0) || 0;
+
+      setStats({
+        agendamentosHoje: agendamentos?.length || 0,
+        clientesAtivos: clientesCount || 0,
+        receitaMensal,
+        taxaConversao: 85 // Valor fixo por enquanto
+      });
+
+      setTodayAppointments(agendamentos || []);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar dados do dashboard",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "confirmado":
+        return <Badge className="bg-success text-success-foreground">Confirmado</Badge>;
+      case "agendado":
+        return <Badge variant="secondary">Agendado</Badge>;
+      case "cancelado":
+        return <Badge variant="destructive">Cancelado</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const dashboardStats = [
+    { title: "Agendamentos Hoje", value: stats.agendamentosHoje.toString(), icon: Calendar, color: "text-primary" },
+    { title: "Clientes Ativos", value: stats.clientesAtivos.toString(), icon: Users, color: "text-success" },
+    { title: "Receita Mensal", value: formatCurrency(stats.receitaMensal), icon: CreditCard, color: "text-warning" },
+    { title: "Taxa Conversão", value: `${stats.taxaConversao}%`, icon: TrendingUp, color: "text-primary" },
+  ];
+
   return (
-    <div className="p-mobile space-y-6">
+    <div className="p-4 space-y-6">
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-4">
-        {stats.map((stat, index) => (
-          <Card key={index} className="shadow-elegant border-0 bg-gradient-soft">
+        {dashboardStats.map((stat, index) => (
+          <Card key={index} className="shadow-lg border-0 bg-secondary">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -57,17 +152,17 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Ações Rápidas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="elegant" className="h-12">
+            <Button variant="default" className="h-12">
               <Plus className="h-4 w-4 mr-2" />
               Novo Cliente
             </Button>
-            <Button variant="soft" className="h-12">
+            <Button variant="outline" className="h-12">
               <Calendar className="h-4 w-4 mr-2" />
               Agendar
             </Button>
@@ -76,7 +171,7 @@ const Dashboard = () => {
       </Card>
 
       {/* Today's Appointments */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center">
             <Clock className="h-5 w-5 mr-2 text-primary" />
@@ -85,16 +180,16 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           {todayAppointments.map((appointment) => (
-            <div className="flex items-center justify-between p-4 bg-gradient-soft rounded-mobile shadow-sm transition-all duration-300 hover:shadow-md">
+            <div key={appointment.id} className="flex items-center justify-between p-4 bg-secondary rounded-md shadow-sm transition-all duration-300 hover:shadow-md">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="font-medium">{appointment.client}</p>
+                  <p className="font-medium">{appointment.clientes?.nome}</p>
                   {getStatusBadge(appointment.status)}
                 </div>
-                <p className="text-sm text-muted-foreground">{appointment.consultant}</p>
+                <p className="text-sm text-muted-foreground">{appointment.consultores?.nome}</p>
               </div>
               <div className="text-right">
-                <p className="font-medium text-primary">{appointment.time}</p>
+                <p className="font-medium text-primary">{formatTime(appointment.data_agendamento)}</p>
               </div>
             </div>
           ))}
@@ -109,7 +204,7 @@ const Dashboard = () => {
       </Card>
 
       {/* Recent Activity */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Atividades Recentes</CardTitle>
         </CardHeader>
@@ -118,22 +213,15 @@ const Dashboard = () => {
             <div className="flex items-center gap-3">
               <CheckCircle className="h-5 w-5 text-success" />
               <div className="flex-1">
-                <p className="text-sm">Consulta finalizada com Maria Silva</p>
-                <p className="text-xs text-muted-foreground">Há 2 horas</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-warning" />
-              <div className="flex-1">
-                <p className="text-sm">Pagamento pendente - Pedro Santos</p>
-                <p className="text-xs text-muted-foreground">Há 4 horas</p>
+                <p className="text-sm">Sistema funcionando normalmente</p>
+                <p className="text-xs text-muted-foreground">Agora</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Users className="h-5 w-5 text-primary" />
               <div className="flex-1">
-                <p className="text-sm">Novo cliente cadastrado</p>
-                <p className="text-xs text-muted-foreground">Ontem</p>
+                <p className="text-sm">{stats.clientesAtivos} clientes ativos</p>
+                <p className="text-xs text-muted-foreground">Última atualização</p>
               </div>
             </div>
           </div>

@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import SchedulingForm from "./SchedulingForm";
 import { 
   Calendar as CalendarIcon, 
   Clock, 
@@ -23,53 +26,84 @@ import {
 const Scheduling = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedConsultant, setSelectedConsultant] = useState<string>("");
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [consultants, setConsultants] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const { toast } = useToast();
 
-  const consultants = [
-    { id: "1", name: "Dr. João Silva", specialty: "Cardiologia", avatar: "JS" },
-    { id: "2", name: "Dra. Ana Costa", specialty: "Dermatologia", avatar: "AC" },
-    { id: "3", name: "Dr. Pedro Santos", specialty: "Ortopedia", avatar: "PS" },
-  ];
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const timeSlots = [
-    "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", 
-    "11:00", "11:30", "14:00", "14:30", "15:00", "15:30", 
-    "16:00", "16:30", "17:00", "17:30"
-  ];
+  useEffect(() => {
+    if (selectedDate) {
+      fetchAppointments();
+    }
+  }, [selectedDate, selectedConsultant]);
 
-  const appointments = [
-    { 
-      id: 1, 
-      client: "Maria Silva", 
-      time: "09:00", 
-      consultant: "Dr. João Silva", 
-      status: "confirmed",
-      date: "2024-01-15"
-    },
-    { 
-      id: 2, 
-      client: "Pedro Santos", 
-      time: "10:30", 
-      consultant: "Dra. Ana Costa", 
-      status: "pending",
-      date: "2024-01-15"
-    },
-    { 
-      id: 3, 
-      client: "Julia Costa", 
-      time: "14:00", 
-      consultant: "Dr. João Silva", 
-      status: "confirmed",
-      date: "2024-01-15"
-    },
-  ];
+  const fetchData = async () => {
+    try {
+      const { data: consultorsData, error: consultorsError } = await supabase
+        .from('consultores')
+        .select('*')
+        .eq('ativo', true)
+        .order('nome');
+
+      if (consultorsError) throw consultorsError;
+      setConsultants(consultorsData || []);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar consultores",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAppointments = async () => {
+    if (!selectedDate) return;
+
+    try {
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      let query = supabase
+        .from('agenda')
+        .select(`
+          *,
+          clientes:cliente_id (nome),
+          consultores:consultor_id (nome),
+          servicos:servico_id (nome)
+        `)
+        .gte('data_agendamento', dateStr)
+        .lt('data_agendamento', new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000).toISOString())
+        .order('data_agendamento');
+
+      if (selectedConsultant) {
+        query = query.eq('consultor_id', parseInt(selectedConsultant));
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      setAppointments(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar agendamentos",
+        variant: "destructive",
+      });
+    }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "confirmed":
+      case "confirmado":
         return <CheckCircle className="h-4 w-4 text-success" />;
-      case "pending":
+      case "agendado":
         return <AlertCircle className="h-4 w-4 text-warning" />;
-      case "cancelled":
+      case "cancelado":
         return <XCircle className="h-4 w-4 text-destructive" />;
       default:
         return <Clock className="h-4 w-4 text-muted-foreground" />;
@@ -78,23 +112,74 @@ const Scheduling = () => {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "confirmed":
+      case "confirmado":
         return <Badge className="bg-success text-success-foreground">Confirmado</Badge>;
-      case "pending":
-        return <Badge variant="secondary">Pendente</Badge>;
-      case "cancelled":
+      case "agendado":
+        return <Badge variant="secondary">Agendado</Badge>;
+      case "cancelado":
         return <Badge variant="destructive">Cancelado</Badge>;
       default:
-        return <Badge variant="outline">Indefinido</Badge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const updateAppointmentStatus = async (appointmentId: number, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('agenda')
+        .update({ status: newStatus })
+        .eq('id', appointmentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Status atualizado",
+        description: `Agendamento ${newStatus} com sucesso.`,
+      });
+
+      fetchAppointments();
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveForm = () => {
+    fetchAppointments();
+    setShowForm(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-mobile space-y-6">
+    <div className="p-4 space-y-6">
       {/* Quick Actions */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardContent className="p-4">
-          <Button variant="elegant" className="w-full h-12">
+          <Button 
+            variant="default" 
+            className="w-full h-12"
+            onClick={() => setShowForm(true)}
+          >
             <Plus className="h-5 w-5 mr-2" />
             Novo Agendamento
           </Button>
@@ -102,7 +187,7 @@ const Scheduling = () => {
       </Card>
 
       {/* Calendar */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center">
             <CalendarIcon className="h-5 w-5 mr-2 text-primary" />
@@ -120,93 +205,48 @@ const Scheduling = () => {
       </Card>
 
       {/* Consultant Selection */}
-      <Card className="shadow-elegant border-0">
+      <Card className="shadow-lg border-0">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Selecionar Consultor</CardTitle>
+          <CardTitle className="text-lg">Filtrar por Consultor</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Select value={selectedConsultant} onValueChange={setSelectedConsultant}>
             <SelectTrigger>
-              <SelectValue placeholder="Escolha um consultor" />
+              <SelectValue placeholder="Todos os consultores" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">Todos os consultores</SelectItem>
               {consultants.map((consultant) => (
-                <SelectItem key={consultant.id} value={consultant.id}>
+                <SelectItem key={consultant.id} value={consultant.id.toString()}>
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center text-xs">
-                      {consultant.avatar}
+                      {consultant.nome.split(' ').map((n: string) => n[0]).join('')}
                     </div>
-                    <span>{consultant.name} - {consultant.specialty}</span>
+                    <span>{consultant.nome}</span>
                   </div>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-
-          {/* Consultant Cards */}
-          <div className="space-y-2">
-            {consultants.map((consultant) => (
-              <div
-                key={consultant.id}
-                className={`p-4 rounded-mobile border cursor-pointer transition-all duration-300 ${
-                  selectedConsultant === consultant.id 
-                    ? 'border-primary bg-gradient-soft shadow-sm' 
-                    : 'border-border bg-card hover:bg-gradient-soft/50'
-                }`}
-                onClick={() => setSelectedConsultant(consultant.id)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-primary">{consultant.avatar}</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">{consultant.name}</p>
-                    <p className="text-sm text-muted-foreground">{consultant.specialty}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </CardContent>
       </Card>
 
-      {/* Available Time Slots */}
-      {selectedDate && selectedConsultant && (
-        <Card className="shadow-elegant border-0">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Horários Disponíveis</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {selectedDate.toLocaleDateString('pt-BR')}
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-2">
-              {timeSlots.map((time) => (
-                <Button
-                  key={time}
-                  variant="soft"
-                  size="sm"
-                  className="h-10 hover:scale-105 transition-all duration-200"
-                >
-                  {time}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Today's Appointments */}
-      <Card className="shadow-elegant border-0">
+      {/* Appointments List */}
+      <Card className="shadow-lg border-0">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center">
             <Clock className="h-5 w-5 mr-2 text-primary" />
-            Agendamentos de Hoje
+            Agendamentos
+            {selectedDate && (
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                - {selectedDate.toLocaleDateString('pt-BR')}
+              </span>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {appointments.map((appointment) => (
-            <div key={appointment.id} className="p-3 bg-muted rounded-mobile">
+            <div key={appointment.id} className="p-3 bg-muted rounded-md">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
@@ -214,31 +254,66 @@ const Scheduling = () => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium">{appointment.client}</h4>
+                      <h4 className="font-medium">{appointment.clientes?.nome}</h4>
                       {getStatusIcon(appointment.status)}
                     </div>
-                    <p className="text-sm text-muted-foreground mb-1">{appointment.consultant}</p>
+                    <p className="text-sm text-muted-foreground mb-1">{appointment.consultores?.nome}</p>
+                    <p className="text-sm text-muted-foreground mb-1">{appointment.servicos?.nome}</p>
                     <div className="flex items-center gap-2">
                       <Clock className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">{appointment.time}</span>
+                      <span className="text-sm text-muted-foreground">{formatTime(appointment.data_agendamento)}</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   {getStatusBadge(appointment.status)}
+                  {appointment.status === 'agendado' && (
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => updateAppointmentStatus(appointment.id, 'confirmado')}
+                        className="h-6 px-2 text-xs"
+                      >
+                        Confirmar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => updateAppointmentStatus(appointment.id, 'cancelado')}
+                        className="h-6 px-2 text-xs"
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
+              {appointment.observacoes && (
+                <div className="mt-2 p-2 bg-background rounded text-sm">
+                  <span className="font-medium">Observações: </span>
+                  {appointment.observacoes}
+                </div>
+              )}
             </div>
           ))}
 
           {appointments.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
               <CalendarIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Nenhum agendamento para hoje</p>
+              <p>Nenhum agendamento para esta data</p>
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Scheduling Form Modal */}
+      {showForm && (
+        <SchedulingForm
+          onClose={() => setShowForm(false)}
+          onSave={handleSaveForm}
+        />
+      )}
     </div>
   );
 };

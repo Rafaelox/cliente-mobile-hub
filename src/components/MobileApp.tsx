@@ -12,6 +12,7 @@ import {
   User
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useInitialData } from "@/hooks/useInitialData";
 import ThemeToggle from "./ThemeToggle";
 import Dashboard from "./mobile/Dashboard";
 import ClientManagement from "./mobile/ClientManagement";
@@ -21,6 +22,7 @@ import Payments from "./mobile/Payments";
 const MobileApp = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const { user, signOut, loading } = useAuth();
+  useInitialData(); // Inicializar dados se necessário
   const navigate = useNavigate();
 
   useEffect(() => {
