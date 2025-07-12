@@ -47,6 +47,13 @@ const Login = () => {
     setLoading(true);
     
     try {
+      // ACESSO DIRETO TEMPORÁRIO
+      if (formData.email === "admin@sistema.com" && formData.password === "admin123") {
+        // Ir direto para o sistema
+        navigate('/');
+        return;
+      }
+      
       if (isLogin) {
         const { error } = await signIn(formData.email, formData.password);
         if (!error) {
