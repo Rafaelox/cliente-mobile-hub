@@ -1,13 +1,13 @@
-# Dockerfile para deploy com EasyPanel
+# Dockerfile otimizado para EasyPanel
 FROM node:18-alpine AS build
 
 WORKDIR /app
 
-# Copiar package.json e package-lock.json (se existir)
+# Copiar package.json e package-lock.json primeiro (melhor cache do Docker)
 COPY package*.json ./
 
 # Instalar dependências
-RUN npm ci
+RUN npm ci --only=production --no-audit
 
 # Copiar código fonte
 COPY . .

@@ -123,6 +123,130 @@ export type Database = {
         }
         Relationships: []
       }
+      campanhas_automaticas: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          created_by: string | null
+          dias_antes: number | null
+          dias_depois: number | null
+          filtros: Json | null
+          id: number
+          nome: string
+          template_id: number
+          tipo_trigger: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          created_by?: string | null
+          dias_antes?: number | null
+          dias_depois?: number | null
+          filtros?: Json | null
+          id?: never
+          nome: string
+          template_id: number
+          tipo_trigger: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          created_by?: string | null
+          dias_antes?: number | null
+          dias_depois?: number | null
+          filtros?: Json | null
+          id?: never
+          nome?: string
+          template_id?: number
+          tipo_trigger?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campanhas_automaticas_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates_comunicacao"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campanhas_marketing: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          created_by: string | null
+          data_agendamento: string | null
+          data_execucao: string | null
+          descricao: string | null
+          filtros: Json
+          id: number
+          nome: string
+          status: string
+          template_id: number | null
+          tipo_comunicacao: string
+          total_destinatarios: number | null
+          total_enviados: number | null
+          total_erro: number | null
+          total_sucesso: number | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          created_by?: string | null
+          data_agendamento?: string | null
+          data_execucao?: string | null
+          descricao?: string | null
+          filtros?: Json
+          id?: never
+          nome: string
+          status?: string
+          template_id?: number | null
+          tipo_comunicacao: string
+          total_destinatarios?: number | null
+          total_enviados?: number | null
+          total_erro?: number | null
+          total_sucesso?: number | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          created_by?: string | null
+          data_agendamento?: string | null
+          data_execucao?: string | null
+          descricao?: string | null
+          filtros?: Json
+          id?: never
+          nome?: string
+          status?: string
+          template_id?: number | null
+          tipo_comunicacao?: string
+          total_destinatarios?: number | null
+          total_enviados?: number | null
+          total_erro?: number | null
+          total_sucesso?: number | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campanhas_marketing_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates_comunicacao"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categorias: {
         Row: {
           ativo: boolean
@@ -358,6 +482,139 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      comunicacoes: {
+        Row: {
+          assunto: string | null
+          campanha_id: number | null
+          cliente_id: number
+          conteudo: string
+          created_at: string
+          created_by: string | null
+          custo: number | null
+          data_entrega: string | null
+          data_envio: string
+          data_leitura: string | null
+          destinatario: string
+          erro_detalhe: string | null
+          external_id: string | null
+          id: number
+          status: string
+          template_id: number | null
+          tipo: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          assunto?: string | null
+          campanha_id?: number | null
+          cliente_id: number
+          conteudo: string
+          created_at?: string
+          created_by?: string | null
+          custo?: number | null
+          data_entrega?: string | null
+          data_envio?: string
+          data_leitura?: string | null
+          destinatario: string
+          erro_detalhe?: string | null
+          external_id?: string | null
+          id?: never
+          status?: string
+          template_id?: number | null
+          tipo: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          assunto?: string | null
+          campanha_id?: number | null
+          cliente_id?: number
+          conteudo?: string
+          created_at?: string
+          created_by?: string | null
+          custo?: number | null
+          data_entrega?: string | null
+          data_envio?: string
+          data_leitura?: string | null
+          destinatario?: string
+          erro_detalhe?: string | null
+          external_id?: string | null
+          id?: never
+          status?: string
+          template_id?: number | null
+          tipo?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comunicacoes_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas_marketing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comunicacoes_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comunicacoes_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates_comunicacao"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      configuracoes_comunicacao: {
+        Row: {
+          api_key: string | null
+          api_secret: string | null
+          ativo: boolean
+          configuracoes_extras: Json | null
+          created_at: string
+          created_by: string | null
+          id: number
+          provider: string
+          tipo_servico: string
+          updated_at: string
+          updated_by: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          api_key?: string | null
+          api_secret?: string | null
+          ativo?: boolean
+          configuracoes_extras?: Json | null
+          created_at?: string
+          created_by?: string | null
+          id?: never
+          provider: string
+          tipo_servico: string
+          updated_at?: string
+          updated_by?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          api_key?: string | null
+          api_secret?: string | null
+          ativo?: boolean
+          configuracoes_extras?: Json | null
+          created_at?: string
+          created_by?: string | null
+          id?: never
+          provider?: string
+          tipo_servico?: string
+          updated_at?: string
+          updated_by?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: []
       }
       configuracoes_empresa: {
         Row: {
@@ -709,6 +966,50 @@ export type Database = {
           },
         ]
       }
+      page_permissions: {
+        Row: {
+          can_access: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          page_name: string
+          page_route: string
+          updated_at: string
+          updated_by: string | null
+          user_id: string
+        }
+        Insert: {
+          can_access?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          page_name: string
+          page_route: string
+          updated_at?: string
+          updated_by?: string | null
+          user_id: string
+        }
+        Update: {
+          can_access?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          page_name?: string
+          page_route?: string
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_permissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       parcelas: {
         Row: {
           created_at: string
@@ -761,27 +1062,33 @@ export type Database = {
           ativo: boolean
           consultor_id: number | null
           created_at: string
+          email: string | null
           id: string
           nome: string
           permissao: string
+          senha_temp: string | null
           updated_at: string
         }
         Insert: {
           ativo?: boolean
           consultor_id?: number | null
           created_at?: string
+          email?: string | null
           id: string
           nome: string
           permissao?: string
+          senha_temp?: string | null
           updated_at?: string
         }
         Update: {
           ativo?: boolean
           consultor_id?: number | null
           created_at?: string
+          email?: string | null
           id?: string
           nome?: string
           permissao?: string
+          senha_temp?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -955,6 +1262,48 @@ export type Database = {
         }
         Relationships: []
       }
+      templates_comunicacao: {
+        Row: {
+          assunto: string | null
+          ativo: boolean
+          conteudo: string
+          created_at: string
+          created_by: string | null
+          id: number
+          nome: string
+          tipo: string
+          updated_at: string
+          updated_by: string | null
+          variaveis: Json | null
+        }
+        Insert: {
+          assunto?: string | null
+          ativo?: boolean
+          conteudo: string
+          created_at?: string
+          created_by?: string | null
+          id?: never
+          nome: string
+          tipo: string
+          updated_at?: string
+          updated_by?: string | null
+          variaveis?: Json | null
+        }
+        Update: {
+          assunto?: string | null
+          ativo?: boolean
+          conteudo?: string
+          created_at?: string
+          created_by?: string | null
+          id?: never
+          nome?: string
+          tipo?: string
+          updated_at?: string
+          updated_by?: string | null
+          variaveis?: Json | null
+        }
+        Relationships: []
+      }
       tipos_recibo: {
         Row: {
           ativo: boolean
@@ -1003,14 +1352,99 @@ export type Database = {
         }
         Relationships: []
       }
+      user_sessions: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          ip_address: unknown | null
+          is_active: boolean | null
+          last_activity: string | null
+          session_token: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          session_token: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          session_token?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_sessions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      create_custom_user: {
+        Args: {
+          user_name: string
+          user_email: string
+          user_password: string
+          user_permission?: string
+          user_consultor_id?: number
+        }
+        Returns: string
+      }
       create_master_profile: {
         Args: { user_id: string; user_name: string }
         Returns: undefined
+      }
+      create_user_with_auth: {
+        Args: {
+          user_name: string
+          user_email: string
+          user_password: string
+          user_permission?: string
+          user_consultor_id?: number
+        }
+        Returns: Json
+      }
+      custom_login: {
+        Args: { user_email: string; user_password: string }
+        Returns: {
+          id: string
+          nome: string
+          email: string
+          permissao: string
+          ativo: boolean
+          consultor_id: number
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      delete_custom_user: {
+        Args: { user_id: string }
+        Returns: boolean
       }
       generate_numero_recibo: {
         Args: Record<PropertyKey, never>
@@ -1060,6 +1494,45 @@ export type Database = {
       make_user_master_by_email: {
         Args: { user_email: string }
         Returns: string
+      }
+      migrate_profiles_to_auth: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      permanent_delete_user: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
+      sync_profile_to_auth: {
+        Args: { profile_id: string }
+        Returns: Json
+      }
+      update_custom_user: {
+        Args: {
+          user_id: string
+          user_name?: string
+          user_email?: string
+          user_password?: string
+          user_permission?: string
+          user_active?: boolean
+          user_consultor_id?: number
+        }
+        Returns: boolean
+      }
+      user_can_access_page: {
+        Args: { user_id: string; page_route: string }
+        Returns: boolean
+      }
+      validate_user_session: {
+        Args: { session_token: string }
+        Returns: {
+          user_id: string
+          nome: string
+          email: string
+          permissao: string
+          ativo: boolean
+          consultor_id: number
+        }[]
       }
     }
     Enums: {
