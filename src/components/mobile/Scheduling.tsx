@@ -80,7 +80,7 @@ const Scheduling = () => {
         .lt('data_agendamento', new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000).toISOString())
         .order('data_agendamento');
 
-      if (selectedConsultant) {
+      if (selectedConsultant && selectedConsultant !== "all") {
         query = query.eq('consultor_id', parseInt(selectedConsultant));
       }
 
@@ -215,7 +215,7 @@ const Scheduling = () => {
               <SelectValue placeholder="Todos os consultores" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos os consultores</SelectItem>
+              <SelectItem value="all">Todos os consultores</SelectItem>
               {consultants.map((consultant) => (
                 <SelectItem key={consultant.id} value={consultant.id.toString()}>
                   <div className="flex items-center gap-2">
