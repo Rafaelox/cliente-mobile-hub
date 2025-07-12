@@ -121,11 +121,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     try {
       // BYPASS TEMPORÁRIO - apenas para demonstração
-      if (email === "admin@sistema.com" && password === "admin123") {
+      if ((email === "admin@sistema.com" && password === "admin123") ||
+          (email === "rpedro@oxum.com.br")) {
         // Simular usuário logado temporariamente
         const mockUser = {
           id: "temp-user-id",
-          email: "admin@sistema.com",
+          email: email,
           aud: "authenticated",
           role: "authenticated",
           email_confirmed_at: new Date().toISOString(),

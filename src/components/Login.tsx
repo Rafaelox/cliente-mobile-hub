@@ -21,8 +21,8 @@ const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: "admin@sistema.com",
-    password: "admin123",
+    email: "rpedro@oxum.com.br",
+    password: "qualquersenha",
     name: ""
   });
   

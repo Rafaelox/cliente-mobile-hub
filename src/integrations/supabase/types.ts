@@ -1057,6 +1057,10 @@ export type Database = {
         Args: { user_email: string }
         Returns: undefined
       }
+      make_user_master_by_email: {
+        Args: { user_email: string }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
