@@ -219,6 +219,18 @@ const Login = () => {
               </div>
             </div>
 
+            {/* Botão de Acesso de Emergência */}
+            <div className="mt-4">
+              <Button
+                type="button"
+                onClick={() => navigate('/')}
+                variant="outline"
+                className="w-full h-12 text-base font-medium"
+              >
+                🚨 Acesso de Emergência - Entrar Direto
+              </Button>
+            </div>
+
             {/* Toggle Login/Cadastro */}
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
