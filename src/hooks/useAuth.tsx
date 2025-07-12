@@ -120,6 +120,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      // BYPASS TEMPORÁRIO - apenas para demonstração
+      if (email === "admin@sistema.com" && password === "admin123") {
+        // Simular usuário logado temporariamente
+        const mockUser = {
+          id: "temp-user-id",
+          email: "admin@sistema.com",
+          aud: "authenticated",
+          role: "authenticated",
+          email_confirmed_at: new Date().toISOString(),
+          phone: "",
+          confirmed_at: new Date().toISOString(),
+          last_sign_in_at: new Date().toISOString(),
+          app_metadata: {},
+          user_metadata: {},
+          identities: [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          is_anonymous: false
+        };
+        
+        const mockProfile = {
+          id: "temp-user-id",
+          nome: "Admin Master",
+          permissao: "master",
+          ativo: true,
+          consultor_id: null
+        };
+        
+        setUser(mockUser as any);
+        setProfile(mockProfile);
+        
+        toast({
+          title: "Login realizado",
+          description: "Acesso temporário liberado.",
+        });
+        
+        return { error: null };
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
