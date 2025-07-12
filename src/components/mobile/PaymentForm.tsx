@@ -36,18 +36,20 @@ export default function PaymentForm({ onClose, onSave }: PaymentFormProps) {
 
   const fetchData = async () => {
     try {
-      // Buscar histórico de atendimentos sem pagamento
-      const { data: historicoData, error: historicoError } = await supabase
-        .from('historico')
+      // Buscar agendamentos realizados (que podem virar pagamentos)
+      const { data: agendamentosData, error: agendamentosError } = await supabase
+        .from('agenda')
         .select(`
           *,
           clientes:cliente_id (nome),
           servicos:servico_id (nome),
           consultores:consultor_id (nome)
         `)
-        .order('data_atendimento', { ascending: false });
+        .eq('status', 'confirmado')
+        .order('data_agendamento', { ascending: false })
+        .limit(20);
 
-      if (historicoError) throw historicoError;
+      if (agendamentosError) throw agendamentosError;
 
       // Buscar formas de pagamento
       const { data: formasData, error: formasError } = await supabase
@@ -58,7 +60,7 @@ export default function PaymentForm({ onClose, onSave }: PaymentFormProps) {
 
       if (formasError) throw formasError;
 
-      setHistorico(historicoData || []);
+      setHistorico(agendamentosData || []);
       setFormasPagamento(formasData || []);
     } catch (error: any) {
       toast({
@@ -69,12 +71,12 @@ export default function PaymentForm({ onClose, onSave }: PaymentFormProps) {
     }
   };
 
-  const handleAtendimentoChange = (atendimentoId: string) => {
-    const atendimento = historico.find(h => h.id === parseInt(atendimentoId));
+  const handleAtendimentoChange = (agendamentoId: string) => {
+    const agendamento = historico.find(h => h.id === parseInt(agendamentoId));
     setFormData({
       ...formData,
-      atendimento_id: atendimentoId,
-      valor: atendimento ? (atendimento.valor_final || atendimento.valor_servico || 0).toString() : "",
+      atendimento_id: agendamentoId,
+      valor: agendamento ? agendamento.valor_servico.toString() : "",
     });
   };
 
@@ -83,19 +85,19 @@ export default function PaymentForm({ onClose, onSave }: PaymentFormProps) {
     setLoading(true);
 
     try {
-      const atendimento = historico.find(h => h.id === parseInt(formData.atendimento_id));
-      if (!atendimento) {
-        throw new Error("Atendimento não encontrado");
+      const agendamento = historico.find(h => h.id === parseInt(formData.atendimento_id));
+      if (!agendamento) {
+        throw new Error("Agendamento não encontrado");
       }
 
       const pagamento = {
         atendimento_id: parseInt(formData.atendimento_id),
-        cliente_id: atendimento.cliente_id,
-        consultor_id: atendimento.consultor_id,
-        servico_id: atendimento.servico_id,
+        cliente_id: agendamento.cliente_id,
+        consultor_id: agendamento.consultor_id,
+        servico_id: agendamento.servico_id,
         forma_pagamento_id: parseInt(formData.forma_pagamento_id),
         valor: parseFloat(formData.valor),
-        valor_original: atendimento.valor_final || atendimento.valor_servico,
+        valor_original: agendamento.valor_servico,
         numero_parcelas: parseInt(formData.numero_parcelas),
         tipo_transacao: formData.tipo_transacao,
         observacoes: formData.observacoes,
@@ -144,25 +146,25 @@ export default function PaymentForm({ onClose, onSave }: PaymentFormProps) {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="atendimento_id">Atendimento *</Label>
+              <Label htmlFor="atendimento_id">Agendamento *</Label>
               <Select
                 value={formData.atendimento_id}
                 onValueChange={handleAtendimentoChange}
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione o atendimento" />
+                  <SelectValue placeholder="Selecione o agendamento" />
                 </SelectTrigger>
                 <SelectContent>
-                  {historico.map((atendimento) => (
-                    <SelectItem key={atendimento.id} value={atendimento.id.toString()}>
+                  {historico.map((agendamento) => (
+                    <SelectItem key={agendamento.id} value={agendamento.id.toString()}>
                       <div className="flex flex-col items-start">
                         <span className="font-medium">
-                          {atendimento.clientes?.nome} - {atendimento.servicos?.nome}
+                          {agendamento.clientes?.nome} - {agendamento.servicos?.nome}
                         </span>
                         <span className="text-sm text-muted-foreground">
-                          {format(new Date(atendimento.data_atendimento), "dd/MM/yyyy")} - 
-                          R$ {(atendimento.valor_final || atendimento.valor_servico)?.toFixed(2)}
+                          {format(new Date(agendamento.data_agendamento), "dd/MM/yyyy")} - 
+                          R$ {agendamento.valor_servico?.toFixed(2)}
                         </span>
                       </div>
                     </SelectItem>

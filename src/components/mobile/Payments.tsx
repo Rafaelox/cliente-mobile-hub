@@ -102,7 +102,7 @@ const Payments = () => {
 
   const getStatusBadge = (payment: any) => {
     if (payment.tipo_transacao === 'entrada') {
-      return <Badge className="bg-success text-success-foreground">Recebido</Badge>;
+      return <Badge className="bg-green-100 text-green-800">Recebido</Badge>;
     } else {
       return <Badge variant="destructive">Saída</Badge>;
     }
@@ -110,7 +110,7 @@ const Payments = () => {
 
   const getStatusIcon = (payment: any) => {
     if (payment.tipo_transacao === 'entrada') {
-      return <CheckCircle className="h-4 w-4 text-success" />;
+      return <CheckCircle className="h-4 w-4 text-green-600" />;
     } else {
       return <AlertTriangle className="h-4 w-4 text-destructive" />;
     }
@@ -140,10 +140,10 @@ const Payments = () => {
   }
 
   const paymentStats = [
-    { title: "Receita Total", value: formatCurrency(stats.receitaTotal), icon: DollarSign, color: "text-success" },
-    { title: "Pendente", value: formatCurrency(stats.pendente), icon: Clock, color: "text-warning" },
+    { title: "Receita Total", value: formatCurrency(stats.receitaTotal), icon: DollarSign, color: "text-green-600" },
+    { title: "Pendente", value: formatCurrency(stats.pendente), icon: Clock, color: "text-orange-600" },
     { title: "Este Mês", value: formatCurrency(stats.esteMes), icon: TrendingUp, color: "text-primary" },
-    { title: "Recebido", value: formatCurrency(stats.recebido), icon: CheckCircle, color: "text-success" },
+    { title: "Recebido", value: formatCurrency(stats.recebido), icon: CheckCircle, color: "text-green-600" },
   ];
 
   return (
@@ -242,7 +242,7 @@ const Payments = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={`font-bold text-lg ${payment.tipo_transacao === 'entrada' ? 'text-success' : 'text-destructive'}`}>
+                  <p className={`font-bold text-lg ${payment.tipo_transacao === 'entrada' ? 'text-green-600' : 'text-red-600'}`}>
                     {payment.tipo_transacao === 'saida' ? '- ' : ''}{formatCurrency(payment.valor)}
                   </p>
                   {payment.numero_parcelas > 1 && (
@@ -286,7 +286,7 @@ const Payments = () => {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Eficiência de Cobrança</span>
-              <span className="font-medium text-success">
+              <span className="font-medium text-green-600">
                 {stats.pendente > 0 ? Math.round((stats.recebido / (stats.recebido + stats.pendente)) * 100) : 100}%
               </span>
             </div>

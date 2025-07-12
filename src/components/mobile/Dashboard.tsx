@@ -90,7 +90,7 @@ const Dashboard = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmado":
-        return <Badge className="bg-success text-success-foreground">Confirmado</Badge>;
+        return <Badge className="bg-green-100 text-green-800">Confirmado</Badge>;
       case "agendado":
         return <Badge variant="secondary">Agendado</Badge>;
       case "cancelado":
@@ -114,6 +114,30 @@ const Dashboard = () => {
     });
   };
 
+  const confirmAppointment = async (appointmentId: number) => {
+    try {
+      const { error } = await supabase
+        .from('agenda')
+        .update({ status: 'confirmado' })
+        .eq('id', appointmentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Agendamento confirmado",
+        description: "O agendamento foi confirmado e está disponível para pagamento",
+      });
+
+      fetchDashboardData();
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Erro ao confirmar agendamento",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-4 flex items-center justify-center">
@@ -127,8 +151,8 @@ const Dashboard = () => {
 
   const dashboardStats = [
     { title: "Agendamentos Hoje", value: stats.agendamentosHoje.toString(), icon: Calendar, color: "text-primary" },
-    { title: "Clientes Ativos", value: stats.clientesAtivos.toString(), icon: Users, color: "text-success" },
-    { title: "Receita Mensal", value: formatCurrency(stats.receitaMensal), icon: CreditCard, color: "text-warning" },
+    { title: "Clientes Ativos", value: stats.clientesAtivos.toString(), icon: Users, color: "text-green-600" },
+    { title: "Receita Mensal", value: formatCurrency(stats.receitaMensal), icon: CreditCard, color: "text-orange-600" },
     { title: "Taxa Conversão", value: `${stats.taxaConversao}%`, icon: TrendingUp, color: "text-primary" },
   ];
 
@@ -188,8 +212,19 @@ const Dashboard = () => {
                 </div>
                 <p className="text-sm text-muted-foreground">{appointment.consultores?.nome}</p>
               </div>
-              <div className="text-right">
-                <p className="font-medium text-primary">{formatTime(appointment.data_agendamento)}</p>
+              <div className="flex items-center gap-2">
+                <div className="text-right">
+                  <p className="font-medium text-primary">{formatTime(appointment.data_agendamento)}</p>
+                </div>
+                {appointment.status === 'agendado' && (
+                  <Button 
+                    size="sm" 
+                    onClick={() => confirmAppointment(appointment.id)}
+                    className="h-6 px-2 text-xs"
+                  >
+                    Confirmar
+                  </Button>
+                )}
               </div>
             </div>
           ))}
@@ -211,7 +246,7 @@ const Dashboard = () => {
         <CardContent className="space-y-3">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <CheckCircle className="h-5 w-5 text-success" />
+              <CheckCircle className="h-5 w-5 text-green-600" />
               <div className="flex-1">
                 <p className="text-sm">Sistema funcionando normalmente</p>
                 <p className="text-xs text-muted-foreground">Agora</p>
