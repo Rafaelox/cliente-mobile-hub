@@ -74,7 +74,7 @@ const MobileApp = () => {
       <main className="pb-20">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsContent value="dashboard" className="mt-0">
-            <Dashboard />
+            <Dashboard onNavigateToClients={() => setActiveTab("clients")} onNavigateToScheduling={() => setActiveTab("schedule")} />
           </TabsContent>
           <TabsContent value="clients" className="mt-0">
             <ClientManagement />

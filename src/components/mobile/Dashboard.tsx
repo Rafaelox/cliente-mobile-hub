@@ -15,7 +15,12 @@ import {
   Plus
 } from "lucide-react";
 
-const Dashboard = () => {
+interface DashboardProps {
+  onNavigateToClients?: () => void;
+  onNavigateToScheduling?: () => void;
+}
+
+const Dashboard = ({ onNavigateToClients, onNavigateToScheduling }: DashboardProps) => {
   const [stats, setStats] = useState({
     agendamentosHoje: 0,
     clientesAtivos: 0,
@@ -182,11 +187,19 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="default" className="h-12">
+            <Button 
+              variant="default" 
+              className="h-12"
+              onClick={onNavigateToClients}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Novo Cliente
             </Button>
-            <Button variant="outline" className="h-12">
+            <Button 
+              variant="outline" 
+              className="h-12"
+              onClick={onNavigateToScheduling}
+            >
               <Calendar className="h-4 w-4 mr-2" />
               Agendar
             </Button>
