@@ -761,33 +761,27 @@ export type Database = {
           ativo: boolean
           consultor_id: number | null
           created_at: string
-          email: string | null
           id: string
           nome: string
           permissao: string
-          senha_temp: string | null
           updated_at: string
         }
         Insert: {
           ativo?: boolean
           consultor_id?: number | null
           created_at?: string
-          email?: string | null
           id: string
           nome: string
           permissao?: string
-          senha_temp?: string | null
           updated_at?: string
         }
         Update: {
           ativo?: boolean
           consultor_id?: number | null
           created_at?: string
-          email?: string | null
           id?: string
           nome?: string
           permissao?: string
-          senha_temp?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -799,6 +793,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles_backup: {
+        Row: {
+          ativo: boolean | null
+          consultor_id: number | null
+          created_at: string | null
+          email: string | null
+          id: string | null
+          nome: string | null
+          permissao: string | null
+          senha_temp: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          consultor_id?: number | null
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          nome?: string | null
+          permissao?: string | null
+          senha_temp?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          consultor_id?: number | null
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          nome?: string | null
+          permissao?: string | null
+          senha_temp?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       recibos: {
         Row: {
@@ -978,46 +1008,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_auth_user_and_profile: {
-        Args: {
-          p_email: string
-          p_password: string
-          p_nome: string
-          p_consultor_id?: number
-          p_permissao?: string
-        }
-        Returns: string
-      }
-      create_custom_user: {
-        Args: {
-          p_nome: string
-          p_email: string
-          p_password: string
-          p_permissao?: string
-          p_consultor_id?: number
-        }
-        Returns: {
-          success: boolean
-          user_id: string
-          message: string
-        }[]
-      }
-      custom_login: {
-        Args: { p_email: string; p_password: string }
-        Returns: {
-          success: boolean
-          user_id: string
-          profile_data: Json
-          message: string
-        }[]
-      }
-      delete_custom_user: {
-        Args: { p_user_id: string }
-        Returns: {
-          success: boolean
-          message: string
-        }[]
-      }
       generate_numero_recibo: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -1058,21 +1048,6 @@ export type Database = {
       is_admin: {
         Args: { _user_id: string }
         Returns: boolean
-      }
-      update_custom_user: {
-        Args: {
-          p_user_id: string
-          p_nome: string
-          p_email: string
-          p_permissao: string
-          p_ativo: boolean
-          p_password?: string
-          p_consultor_id?: number
-        }
-        Returns: {
-          success: boolean
-          message: string
-        }[]
       }
     }
     Enums: {
