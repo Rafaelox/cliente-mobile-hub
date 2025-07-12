@@ -21,9 +21,9 @@ const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    name: ""
+    email: "master@gmail.com",
+    password: "Master123!",
+    name: "Master Admin"
   });
   
   const { signIn, signUp, user } = useAuth();
