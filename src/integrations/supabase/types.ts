@@ -756,6 +756,44 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          ativo: boolean
+          consultor_id: number | null
+          created_at: string
+          id: string
+          nome: string
+          permissao: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          consultor_id?: number | null
+          created_at?: string
+          id: string
+          nome: string
+          permissao?: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          consultor_id?: number | null
+          created_at?: string
+          id?: string
+          nome?: string
+          permissao?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_consultor_id_fkey"
+            columns: ["consultor_id"]
+            isOneToOne: false
+            referencedRelation: "consultores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recibos: {
         Row: {
           cliente_id: number
@@ -978,6 +1016,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_auth_user_and_profile: {
+        Args: {
+          p_email: string
+          p_password: string
+          p_nome: string
+          p_consultor_id?: number
+          p_permissao?: string
+        }
+        Returns: string
+      }
       generate_numero_recibo: {
         Args: Record<PropertyKey, never>
         Returns: string
