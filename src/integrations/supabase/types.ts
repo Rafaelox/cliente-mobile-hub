@@ -1008,6 +1008,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_master_profile: {
+        Args: { user_id: string; user_name: string }
+        Returns: undefined
+      }
       generate_numero_recibo: {
         Args: Record<PropertyKey, never>
         Returns: string
