@@ -761,27 +761,33 @@ export type Database = {
           ativo: boolean
           consultor_id: number | null
           created_at: string
+          email: string | null
           id: string
           nome: string
           permissao: string
+          senha_temp: string | null
           updated_at: string
         }
         Insert: {
           ativo?: boolean
           consultor_id?: number | null
           created_at?: string
+          email?: string | null
           id: string
           nome: string
           permissao?: string
+          senha_temp?: string | null
           updated_at?: string
         }
         Update: {
           ativo?: boolean
           consultor_id?: number | null
           created_at?: string
+          email?: string | null
           id?: string
           nome?: string
           permissao?: string
+          senha_temp?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -967,50 +973,6 @@ export type Database = {
         }
         Relationships: []
       }
-      usuarios: {
-        Row: {
-          ativo: boolean
-          consultor_id: number | null
-          created_at: string
-          email: string
-          id: string
-          nome: string
-          permissao: string
-          senha: string
-          updated_at: string
-        }
-        Insert: {
-          ativo?: boolean
-          consultor_id?: number | null
-          created_at?: string
-          email: string
-          id?: string
-          nome: string
-          permissao?: string
-          senha: string
-          updated_at?: string
-        }
-        Update: {
-          ativo?: boolean
-          consultor_id?: number | null
-          created_at?: string
-          email?: string
-          id?: string
-          nome?: string
-          permissao?: string
-          senha?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "usuarios_consultor_id_fkey"
-            columns: ["consultor_id"]
-            isOneToOne: false
-            referencedRelation: "consultores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
@@ -1025,6 +987,36 @@ export type Database = {
           p_permissao?: string
         }
         Returns: string
+      }
+      create_custom_user: {
+        Args: {
+          p_nome: string
+          p_email: string
+          p_password: string
+          p_permissao?: string
+          p_consultor_id?: number
+        }
+        Returns: {
+          success: boolean
+          user_id: string
+          message: string
+        }[]
+      }
+      custom_login: {
+        Args: { p_email: string; p_password: string }
+        Returns: {
+          success: boolean
+          user_id: string
+          profile_data: Json
+          message: string
+        }[]
+      }
+      delete_custom_user: {
+        Args: { p_user_id: string }
+        Returns: {
+          success: boolean
+          message: string
+        }[]
       }
       generate_numero_recibo: {
         Args: Record<PropertyKey, never>
@@ -1066,6 +1058,21 @@ export type Database = {
       is_admin: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      update_custom_user: {
+        Args: {
+          p_user_id: string
+          p_nome: string
+          p_email: string
+          p_permissao: string
+          p_ativo: boolean
+          p_password?: string
+          p_consultor_id?: number
+        }
+        Returns: {
+          success: boolean
+          message: string
+        }[]
       }
     }
     Enums: {
